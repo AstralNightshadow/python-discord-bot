@@ -7,7 +7,10 @@ class MyClient(discord.Client):
         print(f'Logged on as {self.user}!')
 
     async def on_message(self, message):
-        print(f'Message from {message.author}: {message.content}')
+        print(f'Message from {message.author} in #{message.channel}: {message.content}')
+
+    async def on_message_delete(self, message):
+        print(f'{message.author} has deleted the message: {message.content}')
 
 intents = discord.Intents.default()
 intents.message_content = True
