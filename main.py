@@ -1,7 +1,15 @@
 # imports necessary elements for discord
 import discord
+from discord.ext import commands
+
 #creating the discord client
 class MyClient(discord.Client):
+
+    intents = discord.Intents.default()
+    intents.message_content = True
+
+    bot = commands.Bot(command_prefix='$', intents=intents)
+
     #write message as soon as it is ready
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
@@ -22,6 +30,15 @@ class MyClient(discord.Client):
         channel = client.get_channel(channel_id)
         await channel.send(msg)
         print (msg)
+
+    # this decorator makes a slash command
+    @bot.hybrid_command(description="Sends the bot's latency.") 
+    # a slash command will be created with the name "ping"
+    async def ping(ctx): 
+        await ctx.respond(f"Pong! Latency is {bot.latency}")
+
+
+    bot.add_command(ping)
 
 #set the intents(rights it has)
 intents = discord.Intents.default()
