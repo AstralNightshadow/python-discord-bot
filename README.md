@@ -1,4 +1,7 @@
 # python-discord-bot
 
+## Python version:
+Python 3.12
+
 ## Needed Packages:
-py -3 -m pip install -U discord.py
+pip install -U discord.py
