@@ -12,11 +12,13 @@ class MyClient(discord.Client):
     async def on_message_delete(self, message):
         msg = f'{message.author} has deleted the message: {message.content}'
         try:
-            channel = discord.utils.get(client.get_all_channels(), name='general')
+            channel = discord.utils.get(client.get_all_channels(), name='deleted-msg')
             channel_id = channel.id
         except:
             channel_id = message.channel.id
-        await channel_id.send(msg)
+        
+        channel = client.get_channel(channel_id)
+        await channel.send(msg)
         print (msg)
 
 
