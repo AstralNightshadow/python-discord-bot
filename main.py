@@ -10,7 +10,15 @@ class MyClient(discord.Client):
         print(f'Message from {message.author} in #{message.channel}: {message.content}')
 
     async def on_message_delete(self, message):
-        print(f'{message.author} has deleted the message: {message.content}')
+        msg = f'{message.author} has deleted the message: {message.content}'
+        try:
+            channel = discord.utils.get(client.get_all_channels(), name='general')
+            channel_id = channel.id
+        except:
+            channel_id = message.channel.id
+        await channel_id.send(msg)
+        print (msg)
+
 
 intents = discord.Intents.default()
 intents.message_content = True
