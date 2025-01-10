@@ -5,7 +5,7 @@ from discord.ext import commands
 # Set the intents (permissions)
 intents = discord.Intents.default()
 intents.message_content = True  # Allow reading message content
-intents.guilds = True  # Access guild data like audit logs
+intents.guilds = True  # Allow reading server(guild) data like audit logs
 
 # Create the bot with intents
 bot = commands.Bot(intents=intents)
@@ -15,10 +15,10 @@ bot = commands.Bot(intents=intents)
 async def on_ready():
     print(f'Logged on as {bot.user}!')
 
-# Logs every message sent in a channel
+# Logs every message sent in channels
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:  # Avoid self-replies
+    if message.author == bot.user:  # Ignores own messages
         return
     print(f'Message from {message.author} in #{message.channel}: {message.content}')
 
@@ -26,7 +26,7 @@ async def on_message(message):
 @bot.event
 async def on_message_delete(message):
     msg = f'Someone deleted the message from {message.author} in #{message.channel}: {message.content}'  # Default log message
-    if message.guild:  # Check if the message was in a server
+    if message.guild:  # Check if the message was in server
         # Look for the user who deleted the message in the audit logs
         try:
             async for entry in message.guild.audit_logs(action=discord.AuditLogAction.message_delete, limit=1):
@@ -44,10 +44,51 @@ async def on_message_delete(message):
         await channel.send(msg)  # Send the log message to the appropriate channel
     print(msg)
 
-# A slash command to display bot latency
+# A slash command for to check ping
 @bot.slash_command(description="Sends the bot's latency.")
-async def ping(ctx):
-    await ctx.respond(f"Pong! Latency is {bot.latency * 1000:.2f} ms")
+async def ping(ctx): 
+    await ctx.respond(f"Pong! Latency is {bot.latency * 1000:.2f} ms") 
+
+# ctx is the context of the slash command
+# ctx.respond makes the message a response to the slash command
+
+# A slash command to set reminders
+@bot.slash_command(description="Sends you a reminder at the set time")
+async def reminder(ctx, hours: int, minutes: int, message: str):
+    """
+    Set a reminder.
+    :param hours: The amount of hours (eg. 5)
+    :param minutes: The amount of minutes (eg. 35)
+    :param message: The reminder message (eg. go to sleep)
+    """
+
+    # Check hours and minutes
+    if hours < 0 or minutes < 0:
+        await ctx.respond("Hours and minutes must be non-negative values.")
+        return
+    if minutes >= 60:
+        await ctx.respond("Minutes must be less than 60.")
+        return
+    if hours > 24:
+        await ctx.respond("Hours must be less than 24.")
+        return
+    if hours == 0 and minutes == 0:
+        await ctx.respond("You need to set a time greater than zero.")
+        return
+
+    # Check the message
+    if not message.strip():
+        await ctx.respond("Reminder message cannot be empty.")
+        return
+    if len(message) > 200:
+        await ctx.respond("Reminder message is too long (max 200 characters).")
+        return
+    
+    delay = (minutes * 60) + (hours * 3600)
+    await ctx.respond(f"Sucess! Reminder is due in {hours} hours an {minutes} minutes")
+
+
+
 
 # Start the bot
 bot.run('MTMyNjg4OTgxMTU0NTY5MDEzMg.GnQb_j.FkWAoHfUPePLgWK6rAF3mgw3o4hGydw861mYJM')

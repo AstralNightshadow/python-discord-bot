@@ -4,4 +4,4 @@
 Python 3.12
 
 ## Needed Packages:
-pip install -U discord.py
+pip install -U py-cord
