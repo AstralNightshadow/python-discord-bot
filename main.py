@@ -86,10 +86,11 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
         return
     
     delay = (minutes * 60) + (hours * 3600)
-    await send_reminder(ctx, delay, message)
+    send_reminder(ctx, delay, message)
 
     #TODO Make bot not say the hour/minute count if it is 0
     await ctx.respond(f"Sucess! Reminder is due in {hours} hours and {minutes} minutes")
+    bot.loop.create_task(send_reminder(ctx, delay, message))
 
 async def send_reminder(ctx, delay, message):
     await asyncio.sleep(delay)
