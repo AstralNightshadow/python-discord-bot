@@ -1,49 +1,53 @@
-# imports necessary elements for discord
+# Import necessary elements for Discord
 import discord
 from discord.ext import commands
 
-#creating the discord client
-class MyClient(discord.Client):
-
-    intents = discord.Intents.default()
-    intents.message_content = True
-
-    bot = commands.Bot(command_prefix='$', intents=intents)
-
-    #write message as soon as it is ready
-    async def on_ready(self):
-        print(f'Logged on as {self.user}!')
-
-    #print every message as soon as they are written
-    async def on_message(self, message):
-        print(f'Message from {message.author} in #{message.channel}: {message.content}')
-
-    #print and write a message to a specific channel or the channel it was sent in
-    async def on_message_delete(self, message):
-        msg = f'{message.author} has deleted the message: {message.content}'
-        try:
-            channel = discord.utils.get(client.get_all_channels(), name='deleted-msg')
-            channel_id = channel.id
-        except:
-            channel_id = message.channel.id
-        
-        channel = client.get_channel(channel_id)
-        await channel.send(msg)
-        print (msg)
-
-    # this decorator makes a slash command
-    @bot.hybrid_command(description="Sends the bot's latency.") 
-    # a slash command will be created with the name "ping"
-    async def ping(ctx): 
-        await ctx.respond(f"Pong! Latency is {bot.latency}")
-
-
-    bot.add_command(ping)
-
-#set the intents(rights it has)
+# Set the intents (permissions)
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = True  # Allow reading message content
+intents.guilds = True  # Access guild data like audit logs
 
-#start the client with the token
-client = MyClient(intents=intents)
-client.run('MTMyNjg4OTgxMTU0NTY5MDEzMg.GnQb_j.FkWAoHfUPePLgWK6rAF3mgw3o4hGydw861mYJM')
+# Create the bot with intents
+bot = commands.Bot(intents=intents)
+
+# Runs when the bot is ready
+@bot.event
+async def on_ready():
+    print(f'Logged on as {bot.user}!')
+
+# Logs every message sent in a channel
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:  # Avoid self-replies
+        return
+    print(f'Message from {message.author} in #{message.channel}: {message.content}')
+
+# Logs and reports deleted messages
+@bot.event
+async def on_message_delete(message):
+    msg = f'Someone deleted the message from {message.author} in #{message.channel}: {message.content}'  # Default log message
+    if message.guild:  # Check if the message was in a server
+        # Look for the user who deleted the message in the audit logs
+        try:
+            async for entry in message.guild.audit_logs(action=discord.AuditLogAction.message_delete, limit=1):
+                if entry.target == message.author and entry.extra.channel == message.channel:  # Match the deleted message
+                    msg = f'{entry.user} deleted the message from {message.author} in #{message.channel}: {message.content}'  # Update log message
+                    break
+        except:
+            print(f"no audit log permissions in {message.guild}")
+        # Find the "deleted-msg" channel in the server otherwise default to the
+        channel = discord.utils.get(message.guild.channels, name='deleted-msg') or None
+    else:
+        channel = None
+
+    if channel:
+        await channel.send(msg)  # Send the log message to the appropriate channel
+    print(msg)
+
+# A slash command to display bot latency
+@bot.slash_command(description="Sends the bot's latency.")
+async def ping(ctx):
+    await ctx.respond(f"Pong! Latency is {bot.latency * 1000:.2f} ms")
+
+# Start the bot
+bot.run('MTMyNjg4OTgxMTU0NTY5MDEzMg.GnQb_j.FkWAoHfUPePLgWK6rAF3mgw3o4hGydw861mYJM')
