@@ -1,6 +1,7 @@
 # Import necessary elements for Discord
 import discord
 from discord.ext import commands
+import asyncio
 
 # Set the intents (permissions)
 intents = discord.Intents.default()
@@ -20,18 +21,18 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:  # Ignores own messages
         return
-    print(f'Message from {message.author} in #{message.channel}: {message.content}')
+    print(f'Message from {message.author} in #{message.channel}: \n{message.content}')
 
 # Logs and reports deleted messages
 @bot.event
 async def on_message_delete(message):
-    msg = f'Someone deleted the message from {message.author} in #{message.channel}: {message.content}'  # Default log message
+    msg = f'Someone deleted the message from {message.author} in #{message.channel}: \n{message.content}'  # Default log message
     if message.guild:  # Check if the message was in server
         # Look for the user who deleted the message in the audit logs
         try:
             async for entry in message.guild.audit_logs(action=discord.AuditLogAction.message_delete, limit=1):
                 if entry.target == message.author and entry.extra.channel == message.channel:  # Match the deleted message
-                    msg = f'{entry.user} deleted the message from {message.author} in #{message.channel}: {message.content}'  # Update log message
+                    msg = f'{entry.user} deleted the message from {message.author} in #{message.channel}: \n{message.content}'  # Update log message
                     break
         except:
             print(f"no audit log permissions in {message.guild}")
@@ -87,7 +88,12 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
     delay = (minutes * 60) + (hours * 3600)
     await ctx.respond(f"Sucess! Reminder is due in {hours} hours an {minutes} minutes")
 
-
+async def send_reminder(ctx, delay, message):
+    await asyncio.sleep(delay)
+    try:
+        await ctx.author.send(f"Here is your scheduled reminder: \n{message}")
+    except discord.Forbidden:
+        await ctx.respond(f"{ctx.user.mention}, I couldn't send you a DM. Please make sure your DMs are open.")
 
 
 # Start the bot
