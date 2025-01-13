@@ -65,16 +65,16 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
 
     # Check hours and minutes
     if hours < 0 or minutes < 0:
-        await ctx.respond("Hours and minutes must be non-negative values.")
+        await ctx.respond("Error: Hours and minutes must be non-negative values.")
         return
     elif minutes >= 60:
-        await ctx.respond("Minutes must be less than 60.")
+        await ctx.respond("Error: Minutes must be less than 60.")
         return
     if hours > 24:
-        await ctx.respond("Hours must be less than 24.")
+        await ctx.respond("Error: Hours must be less than 24.")
         return
     if hours == 0 and minutes == 0:
-        await ctx.respond("You need to set a time greater than zero.")
+        await ctx.respond("Error: Time must be greater than zero.")
         return
 
     # Check the message
@@ -85,10 +85,18 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
         await ctx.respond("Reminder message is too long (max 200 characters).")
         return
     
+    # Convert time into seconds
     delay = (minutes * 60) + (hours * 3600)
 
-    #TODO Make bot not say the hour/minute count if it is 0
-    await ctx.respond(f"Sucess! Reminder is due in {hours} hours and {minutes} minutes")
+    # Give a confirmation message that the user set a reminder.
+    if (hours > 0 & minutes > 0):
+        await ctx.respond(f"Sucess! Reminder is due in {hours} hours and {minutes} minutes.")
+    elif hours > 0:
+        await ctx.respond(f"Sucess! Reminder is due in {hours} hours.")
+    elif minutes > 0:
+        await ctx.respond(f"Sucess! Reminder is due in {minutes} minutes")
+    
+    # Start the timer
     bot.loop.create_task(send_reminder(ctx, delay, message))
 
 async def send_reminder(ctx, delay, message):
