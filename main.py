@@ -36,7 +36,7 @@ async def on_message_delete(message):
                     break
         except:
             print(f"no audit log permissions in {message.guild}")
-        # Find the "deleted-msg" channel in the server otherwise default to the
+        # Find the "deleted-msg" channel in the server, if none are found don't send message
         channel = discord.utils.get(message.guild.channels, name='deleted-msg') or None
     else:
         channel = None
