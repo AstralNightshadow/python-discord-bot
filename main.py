@@ -16,12 +16,24 @@ bot = commands.Bot(intents=intents)
 async def on_ready():
     print(f'Logged on as {bot.user}!')
 
+
+
+###################
+# On Message sent #
+###################
+
 # Logs every message sent in channels
 @bot.event
 async def on_message(message):
     if message.author == bot.user:  # Ignores own messages
         return
     print(f'Message from {message.author} in #{message.channel}: \n{message.content}')
+
+
+
+######################
+# On Message deleted #
+######################
 
 # Logs and reports deleted messages
 @bot.event
@@ -45,6 +57,12 @@ async def on_message_delete(message):
         await channel.send(msg)  # Send the log message to the appropriate channel
     print(msg)
 
+
+
+########
+# Ping #
+########
+
 # A slash command for to check ping
 @bot.slash_command(description="Sends the bot's latency.")
 async def ping(ctx): 
@@ -52,6 +70,12 @@ async def ping(ctx):
 
 # ctx is the context of the slash command
 # ctx.respond makes the message a response to the slash command
+
+
+
+############
+# Reminder #
+############
 
 # A slash command to set reminders
 @bot.slash_command(description="Sends you a reminder at the set time")
