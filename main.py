@@ -67,7 +67,7 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
     if hours < 0 or minutes < 0:
         await ctx.respond("Hours and minutes must be non-negative values.")
         return
-    if minutes >= 60:
+    elif minutes >= 60:
         await ctx.respond("Minutes must be less than 60.")
         return
     if hours > 24:
@@ -86,7 +86,6 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
         return
     
     delay = (minutes * 60) + (hours * 3600)
-    send_reminder(ctx, delay, message)
 
     #TODO Make bot not say the hour/minute count if it is 0
     await ctx.respond(f"Sucess! Reminder is due in {hours} hours and {minutes} minutes")
