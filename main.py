@@ -1,7 +1,10 @@
 # Import necessary elements for Discord
 import discord
 from discord.ext import commands
+# Import to be able to handle multiple things at once
 import asyncio
+# Import to read environment variable for token
+import os
 
 # Set the intents (permissions)
 intents = discord.Intents.default()
@@ -22,13 +25,13 @@ async def on_ready():
 # On Message sent #
 ###################
 
-# Logs every message sent in channels
+# Logs every message sent in channels to the console
 @bot.event
 async def on_message(message):
     if message.author == bot.user:  # Ignores own messages
         return
     print(f'Message from {message.author} in #{message.channel}: \n{message.content}')
-
+# NOTE: Maybe remove if bot is widely used.
 
 
 ######################
@@ -123,6 +126,7 @@ async def reminder(ctx, hours: int, minutes: int, message: str):
     # Start the timer
     bot.loop.create_task(send_reminder(ctx, delay, message))
 
+# Actually send the reminder
 async def send_reminder(ctx, delay, message):
     await asyncio.sleep(delay)
     try:
@@ -132,4 +136,4 @@ async def send_reminder(ctx, delay, message):
 
 
 # Start the bot
-bot.run('MTMyNjg4OTgxMTU0NTY5MDEzMg.GnQb_j.FkWAoHfUPePLgWK6rAF3mgw3o4hGydw861mYJM')
+bot.run(os.environ['discord_bot_token'])
