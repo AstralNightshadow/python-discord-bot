@@ -1,4 +1,5 @@
 # python-discord-bot
+This is just a small thing I made for a school project. It's also my first discord bot, so enjoy!
 
 ## Python version:
 Python 3.12
